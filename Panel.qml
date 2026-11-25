@@ -51,6 +51,62 @@ Panel {
     return false;
   }
 
+  function selectCategoryByIndex(idx) {
+    if (idx < 0 || idx >= CarbonData.CATEGORIES.length) return;
+    root.selectedCategory = CarbonData.CATEGORIES[idx].name;
+    var items = CarbonData.CARBON_ITEMS;
+    for (var i = 0; i < items.length; i++) {
+      if (root.itemMatchesFilter(items[i])) {
+        root.selectedId = items[i].id;
+        return;
+      }
+    }
+  }
+
+  function cycleCategory(delta) {
+    var cats = CarbonData.CATEGORIES;
+    var cur = 0;
+    for (var i = 0; i < cats.length; i++) {
+      if (cats[i].name === root.selectedCategory) { cur = i; break; }
+    }
+    var next = (cur + delta + cats.length) % cats.length;
+    root.selectCategoryByIndex(next);
+  }
+
+  function moveSelection(dx, dy) {
+    var items = CarbonData.CARBON_ITEMS;
+    var curIdx = -1;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === root.selectedId) { curIdx = i; break; }
+    }
+    if (curIdx < 0) curIdx = 0;
+
+    var curRow = Math.floor(curIdx / 6);
+    var curCol = curIdx % 6;
+    var targetRow = Math.max(0, Math.min(5, curRow + dy));
+    var targetCol = Math.max(0, Math.min(5, curCol + dx));
+    var targetIdx = targetRow * 6 + targetCol;
+
+    if (targetIdx >= 0 && targetIdx < items.length && root.itemMatchesFilter(items[targetIdx])) {
+      root.selectedId = items[targetIdx].id;
+      return;
+    }
+
+    // Fallback: step linearly through visible filtered items
+    var visible = [];
+    var visPos = -1;
+    for (var j = 0; j < items.length; j++) {
+      if (root.itemMatchesFilter(items[j])) {
+        if (items[j].id === root.selectedId) visPos = visible.length;
+        visible.push(items[j]);
+      }
+    }
+    if (visible.length === 0) return;
+    var step = dy !== 0 ? (dy > 0 ? 1 : -1) : (dx > 0 ? 1 : -1);
+    var nextPos = visPos < 0 ? 0 : Math.max(0, Math.min(visible.length - 1, visPos + step));
+    root.selectedId = visible[nextPos].id;
+  }
+
   function open() {
     root.controller.show();
   }
@@ -83,7 +139,7 @@ Panel {
     centerOnBar: false
     focusTarget: panel.loadedContent
     contentWidth: panel.fittedContentWidth(Style.space(1040))
-    contentHeight: panel.fittedContentHeight(Style.space(650))
+    contentHeight: panel.fittedContentHeight(Style.space(690))
 
     content: PanelKeyCatcher {
       id: keyCatcher
@@ -91,6 +147,23 @@ Panel {
       blocked: searchField.activeFocus
       onCloseRequested: root.close()
       onTabRequested: function(direction) { root.switchPanel(direction) }
+      onMoveRequested: function(dx, dy) { root.moveSelection(dx, dy) }
+      onActivateRequested: molCanvasItem.showFullAtoms = !molCanvasItem.showFullAtoms
+      onTextKey: function(t, modifiers) {
+        if (t === "v" || t === "V") {
+          molCanvasItem.showFullAtoms = !molCanvasItem.showFullAtoms;
+        } else if (t === "`" || t === "0") {
+          root.selectCategoryByIndex(0);
+        } else if (t >= "1" && t <= "6") {
+          root.selectCategoryByIndex(parseInt(t, 10));
+        } else if (t === "[") {
+          root.cycleCategory(-1);
+        } else if (t === "]") {
+          root.cycleCategory(1);
+        } else if (t === "/") {
+          searchField.forceActiveFocus();
+        }
+      }
 
       Column {
         id: mainCol
@@ -136,12 +209,11 @@ Panel {
               font.pixelSize: Style.font.bodySmall
               clip: true
               onTextChanged: root.searchQuery = text
+              Keys.onReturnPressed: keyCatcher.forceActiveFocus()
+              Keys.onDownPressed: keyCatcher.forceActiveFocus()
               Keys.onEscapePressed: {
                 if (text !== "") text = "";
-                else {
-                  focus = false;
-                  root.close();
-                }
+                keyCatcher.forceActiveFocus();
               }
 
               Text {
@@ -226,7 +298,7 @@ Panel {
         Row {
           id: bodyRow
           width: parent.width
-          height: mainCol.height - headerBar.height - filterFlick.height - Style.space(20)
+          height: mainCol.height - headerBar.height - filterFlick.height - shortcutStrip.height - Style.space(26)
           spacing: Style.space(14)
 
           // Left Pane: 6x6 Grid
@@ -362,7 +434,7 @@ Panel {
 
               Column {
                 id: detailCol
-                width: detailScroll.width
+                width: detailScroll.width - 16
                 spacing: Style.space(7)
 
                 // Title + Category Badge
@@ -437,8 +509,9 @@ Panel {
 
                 // Live 2D Molecular Bond Canvas
                 MolecularCanvas {
+                  id: molCanvasItem
                   width: parent.width
-                  height: Style.space(155)
+                  height: 216
                   itemData: root.selectedItem
                   panelForeground: root.fgColor
                 }
@@ -540,6 +613,20 @@ Panel {
               }
             }
           }
+        }
+
+        // ---- Bottom Keyboard Shortcut Hint Strip
+        Text {
+          id: shortcutStrip
+          width: parent.width
+          height: 20
+          verticalAlignment: Text.AlignVCenter
+          textFormat: Text.PlainText
+          text: "⌨  Arrows / HJKL: Navigate Grid   •   0–6 or [ ]: Filter Category   •   Space: Toggle Atom View   •   /: Search   •   Esc: Close"
+          color: root.dimFg
+          font.family: Style.font.family
+          font.pixelSize: 11
+          elide: Text.ElideRight
         }
       }
     }
