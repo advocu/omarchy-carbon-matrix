@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import qs.Commons
 import qs.Commons as Commons
@@ -40,6 +41,7 @@ Panel {
     if (q === "") return true;
     if (item.id.toLowerCase().indexOf(q) !== -1) return true;
     if (item.name.toLowerCase().indexOf(q) !== -1) return true;
+    if (item.shortName && item.shortName.toLowerCase().indexOf(q) !== -1) return true;
     if (item.symbol.toLowerCase().indexOf(q) !== -1) return true;
     if (item.iupacSuffix.toLowerCase().indexOf(q) !== -1) return true;
     for (var i = 0; i < item.realWorld.length; i++) {
@@ -79,8 +81,8 @@ Panel {
     open: root.opened
     centerOnBar: false
     focusTarget: panel.loadedContent
-    contentWidth: panel.fittedContentWidth(Style.space(960))
-    contentHeight: panel.fittedContentHeight(Style.space(620))
+    contentWidth: panel.fittedContentWidth(Style.space(1040))
+    contentHeight: panel.fittedContentHeight(Style.space(650))
 
     content: PanelKeyCatcher {
       id: keyCatcher
@@ -115,7 +117,7 @@ Panel {
             id: searchBox
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            width: Style.space(250)
+            width: Style.space(280)
             height: Style.space(30)
             radius: Style.space(6)
             color: root.cardBg
@@ -145,7 +147,7 @@ Panel {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
                 textFormat: Text.PlainText
-                text: "Search name, symbol, suffix, or item..."
+                text: "Search carbon form or example..."
                 color: root.dimFg
                 font.family: Style.font.family
                 font.pixelSize: Style.font.bodySmall
@@ -229,7 +231,7 @@ Panel {
           // Left Pane: 6x6 Grid
           Grid {
             id: matrixGrid
-            width: Math.floor(bodyRow.width * 0.56)
+            width: Math.max(Style.space(618), Math.floor(bodyRow.width * 0.59))
             height: bodyRow.height
             columns: 6
             rows: 6
@@ -260,43 +262,47 @@ Panel {
                   ? catColor
                   : Qt.rgba(catColor.r, catColor.g, catColor.b, 0.55)
 
-                Column {
+                Item {
                   anchors.fill: parent
                   anchors.margins: Style.space(5)
-                  spacing: Style.space(2)
 
                   Text {
-                    width: parent.width
+                    anchors.top: parent.top
+                    anchors.left: parent.left
                     textFormat: Text.PlainText
                     text: modelData.id
                     color: tile.catColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.caption
+                    font.pixelSize: 11
                     font.weight: Font.Bold
                   }
 
                   Text {
-                    width: parent.width
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: -Style.space(2)
+                    width: parent.width - 4
                     textFormat: Text.PlainText
                     text: modelData.symbol
                     color: root.fgColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.body
+                    font.pixelSize: 17
                     font.weight: Font.Bold
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                   }
 
                   Text {
-                    width: parent.width
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width - 12
                     textFormat: Text.PlainText
-                    text: modelData.name
+                    text: modelData.shortName
                     color: root.dimFg
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.caption
+                    font.pixelSize: 11
+                    horizontalAlignment: Text.AlignHCenter
+                    maximumLineCount: 1
                     elide: Text.ElideRight
-                    maximumLineCount: 2
-                    wrapMode: Text.Wrap
                   }
                 }
 
@@ -324,16 +330,19 @@ Panel {
             Flickable {
               id: detailScroll
               anchors.fill: parent
-              anchors.margins: Style.space(12)
+              anchors.margins: Style.space(10)
               contentWidth: width
               contentHeight: detailCol.implicitHeight
               clip: true
               boundsBehavior: Flickable.StopAtBounds
+              ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+              }
 
               Column {
                 id: detailCol
                 width: detailScroll.width
-                spacing: Style.space(8)
+                spacing: Style.space(7)
 
                 // Title + Category Badge
                 Row {
@@ -374,7 +383,7 @@ Panel {
                 // Metadata Chips: Category, Formula, Suffix, Hybridization, Angle
                 Flow {
                   width: parent.width
-                  spacing: Style.space(6)
+                  spacing: Style.space(5)
 
                   Repeater {
                     model: [
@@ -385,8 +394,8 @@ Panel {
                       "Angle: " + root.selectedItem.bondAngle
                     ]
                     delegate: Rectangle {
-                      implicitWidth: chipTxt.implicitWidth + Style.space(14)
-                      implicitHeight: Style.space(22)
+                      implicitWidth: chipTxt.implicitWidth + 16
+                      implicitHeight: chipTxt.implicitHeight + 8
                       radius: Style.space(4)
                       color: Qt.rgba(root.fgColor.r, root.fgColor.g, root.fgColor.b, 0.08)
                       border.width: 1
@@ -399,7 +408,7 @@ Panel {
                         text: modelData
                         color: root.fgColor
                         font.family: Style.font.family
-                        font.pixelSize: Style.font.caption
+                        font.pixelSize: 11
                       }
                     }
                   }
