@@ -42,6 +42,7 @@ Panel {
     if (item.id.toLowerCase().indexOf(q) !== -1) return true;
     if (item.name.toLowerCase().indexOf(q) !== -1) return true;
     if (item.shortName && item.shortName.toLowerCase().indexOf(q) !== -1) return true;
+    if (item.noobHint && item.noobHint.toLowerCase().indexOf(q) !== -1) return true;
     if (item.symbol.toLowerCase().indexOf(q) !== -1) return true;
     if (item.iupacSuffix.toLowerCase().indexOf(q) !== -1) return true;
     for (var i = 0; i < item.realWorld.length; i++) {
@@ -273,36 +274,56 @@ Panel {
                     text: modelData.id
                     color: tile.catColor
                     font.family: Style.font.family
-                    font.pixelSize: 11
+                    font.pixelSize: 12
                     font.weight: Font.Bold
                   }
 
                   Text {
                     anchors.centerIn: parent
-                    anchors.verticalCenterOffset: -Style.space(2)
+                    anchors.verticalCenterOffset: -Style.space(8)
                     width: parent.width - 4
                     textFormat: Text.PlainText
                     text: modelData.symbol
-                    color: root.fgColor
+                    color: "#F8FAFC"
                     font.family: Style.font.family
-                    font.pixelSize: 17
+                    font.pixelSize: 19
                     font.weight: Font.Bold
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                   }
 
-                  Text {
+                  Column {
                     anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width - 12
-                    textFormat: Text.PlainText
-                    text: modelData.shortName
-                    color: root.dimFg
-                    font.family: Style.font.family
-                    font.pixelSize: 11
-                    horizontalAlignment: Text.AlignHCenter
-                    maximumLineCount: 1
-                    elide: Text.ElideRight
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing: 1
+
+                    Text {
+                      width: parent.width - 4
+                      anchors.horizontalCenter: parent.horizontalCenter
+                      textFormat: Text.PlainText
+                      text: modelData.shortName
+                      color: "#FFFFFF"
+                      font.family: Style.font.family
+                      font.pixelSize: 14
+                      font.weight: Font.Bold
+                      horizontalAlignment: Text.AlignHCenter
+                      maximumLineCount: 1
+                      elide: Text.ElideRight
+                    }
+
+                    Text {
+                      width: parent.width - 4
+                      anchors.horizontalCenter: parent.horizontalCenter
+                      textFormat: Text.PlainText
+                      text: modelData.noobHint
+                      color: "#CBD5E1"
+                      font.family: Style.font.family
+                      font.pixelSize: 11
+                      horizontalAlignment: Text.AlignHCenter
+                      maximumLineCount: 1
+                      elide: Text.ElideRight
+                    }
                   }
                 }
 
@@ -388,8 +409,8 @@ Panel {
                   Repeater {
                     model: [
                       root.selectedItem.category,
-                      "Ex: " + root.selectedItem.formulaExample,
-                      "Suffix: " + root.selectedItem.iupacSuffix,
+                      "Formula: " + root.selectedItem.formulaExample,
+                      "Word Ending: " + root.selectedItem.iupacSuffix,
                       root.selectedItem.hybridization,
                       "Angle: " + root.selectedItem.bondAngle
                     ]
@@ -417,7 +438,7 @@ Panel {
                 // Live 2D Molecular Bond Canvas
                 MolecularCanvas {
                   width: parent.width
-                  height: Style.space(165)
+                  height: Style.space(155)
                   itemData: root.selectedItem
                   panelForeground: root.fgColor
                 }
@@ -425,14 +446,14 @@ Panel {
                 // Section 1: What Is It? (Noob Translation)
                 Column {
                   width: parent.width
-                  spacing: Style.space(4)
+                  spacing: Style.space(3)
 
                   Text {
                     textFormat: Text.PlainText
                     text: "What Is It? (Noob Translation)"
                     color: detailCard.activeCatColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: 15
                     font.weight: Font.Bold
                   }
 
@@ -442,7 +463,8 @@ Panel {
                     text: root.selectedItem.eli12
                     color: root.fgColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: 14
+                    lineHeight: 1.35
                     wrapMode: Text.WordWrap
                   }
                 }
@@ -450,14 +472,14 @@ Panel {
                 // Section 2: How To Spot It In A Formula
                 Column {
                   width: parent.width
-                  spacing: Style.space(4)
+                  spacing: Style.space(3)
 
                   Text {
                     textFormat: Text.PlainText
                     text: "How To Spot It In A Formula"
                     color: detailCard.activeCatColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: 15
                     font.weight: Font.Bold
                   }
 
@@ -467,7 +489,8 @@ Panel {
                     text: root.selectedItem.howToSpot + " — Behavior: " + root.selectedItem.reactivity
                     color: root.dimFg
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: 14
+                    lineHeight: 1.35
                     wrapMode: Text.WordWrap
                   }
                 }
@@ -475,14 +498,14 @@ Panel {
                 // Section 3: Where You Touch Or Eat It Daily
                 Column {
                   width: parent.width
-                  spacing: Style.space(6)
+                  spacing: Style.space(5)
 
                   Text {
                     textFormat: Text.PlainText
                     text: "Where You Touch Or Eat It Daily"
                     color: detailCard.activeCatColor
                     font.family: Style.font.family
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: 15
                     font.weight: Font.Bold
                   }
 

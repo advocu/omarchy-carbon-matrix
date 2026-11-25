@@ -59,19 +59,21 @@ Item {
   }
 
   // Legend row at bottom-left
-  Row {
+  Flow {
     z: 2
     anchors.left: parent.left
+    anchors.right: parent.right
     anchors.bottom: parent.bottom
     anchors.margins: Style.space(8)
-    spacing: Style.space(10)
+    spacing: Style.space(8)
 
     Repeater {
       model: [
-        { label: "C", col: "#10B981" },
-        { label: "O", col: "#EF4444" },
-        { label: "N", col: "#3B82F6" },
-        { label: "H", col: "#94A3B8" }
+        { label: "Carbon (C)", col: "#10B981" },
+        { label: "Oxygen (O)", col: "#EF4444" },
+        { label: "Nitrogen (N)", col: "#3B82F6" },
+        { label: "Hydrogen (H)", col: "#94A3B8" },
+        { label: "Halogen/Sulfur", col: "#22D3EE" }
       ]
       delegate: Row {
         spacing: Style.space(4)
@@ -85,9 +87,9 @@ Item {
         Text {
           textFormat: Text.PlainText
           text: modelData.label
-          color: Qt.rgba(root.panelForeground.r, root.panelForeground.g, root.panelForeground.b, 0.72)
+          color: Qt.rgba(root.panelForeground.r, root.panelForeground.g, root.panelForeground.b, 0.85)
           font.family: Style.font.family
-          font.pixelSize: Style.font.bodySmall
+          font.pixelSize: 12
         }
       }
     }
@@ -275,7 +277,7 @@ Item {
         ];
         for (var i4 = 0; i4 < 4; i4++) {
           drawBond(cx, cy, pts4[i4].x, pts4[i4].y, 1);
-          drawAtom(pts4[i4].x, pts4[i4].y, full ? "R" : "H", H_COL, 13);
+          drawAtom(pts4[i4].x, pts4[i4].y, "H", H_COL, 13);
         }
         drawAtom(cx, cy, "C", C_COL, 18);
       } else if (mode === "sp3_tetra" || mode === "methane") {
@@ -388,6 +390,14 @@ Item {
         drawBond(ac1.x, ac1.y, ac2.x, ac2.y, 1);
         drawBond(ac2.x, ac2.y, ao.x, ao.y, 1);
         drawBond(ao.x, ao.y, ah.x, ah.y, 1);
+        if (full) {
+          drawBond(ac1.x, ac1.y, ac1.x - u * 0.5, ac1.y - u * 0.4, 1);
+          drawBond(ac1.x, ac1.y, ac1.x - u * 0.35, ac1.y + u * 0.55, 1);
+          drawBond(ac2.x, ac2.y, ac2.x, ac2.y - u * 0.55, 1);
+          drawAtom(ac1.x - u * 0.5, ac1.y - u * 0.4, "H", H_COL, 10);
+          drawAtom(ac1.x - u * 0.35, ac1.y + u * 0.55, "H", H_COL, 10);
+          drawAtom(ac2.x, ac2.y - u * 0.55, "H", H_COL, 10);
+        }
         drawAtom(ac1.x, ac1.y, "C", C_COL);
         drawAtom(ac2.x, ac2.y, "C", C_COL);
         drawAtom(ao.x, ao.y, "O", O_COL);
@@ -684,7 +694,7 @@ Item {
         drawBond(aac2.x, aac2.y, aao1.x, aao1.y, 2);
         drawBond(aac2.x, aac2.y, aao2.x, aao2.y, 1);
         drawAtom(aan.x, aan.y, "NH₃⁺", N_COL, 14);
-        drawAtom(aar.x, aar.y, "R", "#A855F7", 13);
+        drawAtom(aar.x, aar.y, "CH₃", C_COL, 14);
         drawAtom(aao1.x, aao1.y, "O", O_COL, 12);
         drawAtom(aao2.x, aao2.y, "O⁻", O_COL, 12);
         drawAtom(aac2.x, aac2.y, "C", C_COL, 13);
