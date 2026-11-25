@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.advocu.carbon-matrix",
+  "name": "Carbon Matrix",
+  "version": "1.0.0",
+  "author": "Suyash Verma",
+  "license": "MIT",
+  "description": "An interactive 6x6 Periodic Table of Carbon and Organic Chemistry for beginners with live 2D molecular bond canvases and plain-English cards.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Carbon Matrix",
+    "category": "Education",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
